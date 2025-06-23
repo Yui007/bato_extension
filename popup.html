@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bato.to Manga Downloader</title>
-  <script src="popup.js"></script>
+  <title>Bato Manga Downloader</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h1>Bato.to Manga Downloader</h1>
-  <button id="downloadChapter">Download Current Chapter</button>
-  <button id="downloadSeries">Download Series</button>
+  <div class="container">
+    <h1>Bato Manga Downloader</h1>
+    <button id="downloadChapter" class="btn">Download Current Chapter</button>
+    <button id="downloadSeries" class="btn">Download Series</button>
+
+    <div class="range-download">
+      <input type="number" id="startChapter" placeholder="Start Chapter" class="input-field">
+      <input type="number" id="endChapter" placeholder="End Chapter" class="input-field">
+      <button id="downloadRange" class="btn">Download Range</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
 </body>
 </html>

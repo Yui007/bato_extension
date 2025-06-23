@@ -3,6 +3,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     downloadCurrentChapter();
   } else if (request.action === "downloadSeries") {
     downloadSeries();
+  } else if (request.action === "downloadRange") {
+    downloadChapterRange(request.start, request.end);
   }
 });
 
@@ -66,6 +68,55 @@ async function downloadSeries() {
     }
   } catch (error) {
     console.error('Error downloading series:', error);
+  }
+}
+
+/**
+ * Download a range of chapters from the current series.
+ * @param {number} startChapterNum - The starting chapter number.
+ * @param {number} endChapterNum - The ending chapter number.
+ */
+async function downloadChapterRange(startChapterNum, endChapterNum) {
+  try {
+    const mangaTitle = document.querySelector('h3.item-title')?.textContent.trim() || 'manga';
+    const chapters = [];
+
+    document.querySelectorAll('a.chapt').forEach(chapterElement => {
+      const chapterTitle = chapterElement.textContent.trim();
+      const chapterUrl = chapterElement.href;
+      // Extract chapter number from title, assuming format like "Chapter 123" or "Ch.123"
+      const match = chapterTitle.match(/(?:Chapter|Ch\.)\s*(\d+(\.\d+)?)/i);
+      if (match && match[1]) {
+        chapters.push({ title: chapterTitle, url: chapterUrl, number: parseFloat(match[1]) });
+      }
+    });
+
+    const chaptersToDownload = chapters.filter(chapter =>
+      chapter.number >= startChapterNum && chapter.number <= endChapterNum
+    ).sort((a, b) => a.number - b.number); // Sort by chapter number
+
+    if (chaptersToDownload.length === 0) {
+      alert(`No chapters found in the range ${startChapterNum} to ${endChapterNum}.`);
+      return;
+    }
+
+    for (const chapter of chaptersToDownload) {
+      const imageUrls = await getChapterImageUrls(chapter.url);
+      for (let i = 0; i < imageUrls.length; i++) {
+        const imgUrl = imageUrls[i];
+        const ext = imgUrl.split('.').pop().split('?')[0];
+        const filename = `${mangaTitle}/${chapter.title}/page_${i + 1}.${ext}`;
+
+        chrome.runtime.sendMessage({
+          action: "download",
+          url: imgUrl,
+          filename: filename
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Optional delay
+    }
+  } catch (error) {
+    console.error('Error downloading chapter range:', error);
   }
 }
 

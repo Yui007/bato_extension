@@ -1,15 +1,17 @@
 {
-  "manifest_version": 2,
-  "name": "Bato.to Manga Downloader",
+  "manifest_version": 3,
+  "name": "Bato Manga Downloader",
   "version": "1.0",
   "description": "Download manga chapters from Bato.to",
   "permissions": [
     "activeTab",
     "storage",
-    "downloads",
+    "downloads"
+  ],
+  "host_permissions": [
     "https://bato.to/*"
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icon/icon16.png",
@@ -18,8 +20,7 @@
     }
   },
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
